@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineManiaci - Catalogo Locale</title>
+</head>
+<body style="font-family: sans-serif; max-width: 900px; margin: 30px auto; padding: 20px; line-height: 1.5;">
+
+    <h1>🎬 CineManiaci - Cerca Film</h1>
+    <p>Cerca i titoli archiviati all'interno del database locale della piattaforma.</p>
+    
+    <div style="margin-bottom: 30px; background: #f1f5f9; padding: 15px; border-radius: 6px;">
+        <input type="text" id="campoCerca" placeholder="Scrivi una parte del titolo (es. Matrix)..." style="padding: 8px; width: 300px; font-size: 14px;">
+        <button onclick="avviaRicerca()" style="padding: 8px 15px; font-size: 14px; cursor: pointer;">Cerca</button>
+    </div>
+
+    <h2>Risultati della Ricerca</h2>
+    <div id="risultati" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
+        </div>
+
+    <hr>
+
+    <div id="schedaFilm" style="display: none; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 25px; border-radius: 8px;">
+        <h2 id="schedaTitolo" style="color: #16a34a; margin-top: 0;"></h2>
+        <p><b>Anno di Uscita:</b> <span id="schedaAnno"></span></p>
+        <p><b>Trama del Film:</b></p>
+        <p id="schedaTrama" style="font-style: italic; color: #374151;"></p>
+    </div>
+
+
+    <script>
+        const API_URL = "https://sturdy-space-parakeet-6v99xr999p5r3xv9g-8000.app.github.dev/";
+
+        async function avviaRicerca() {
+            campoCerca = document.getElementById("campoCerca").value.trim();
+            if (campoCerca === "") {
+                alert("Inserisci una parola chiave per la ricerca.");
+                return;
+            }   
+
+            
+ 
+            
+        }
+        async function avviaRicerca() {
+            
+            const query = document.getElementById("query").value;
+
+            try {
+                
+                const risposta = await fetch(`/film/cerca?keyword=${encodeURIComponent(query)}`);
+                const film = await risposta.json();
+
+                
+                const contenitore = document.getElementById("risultati");
+                contenitore.innerHTML = "";
+
+                if (film.length === 0) {
+                    contenitore.innerHTML = "<p>Nessun film trovato.</p>";
+                    return;
+                }
+
+                
+                film.forEach(f => {
+                
+                    const div = document.createElement("div");
+                    div.className = "film";
+                    div.innerHTML = `
+                        <h3>${f.titolo}</h3>
+                        <p>Anno: ${f.anno}</p>
+                        <p>Regista: ${f.regista}</p>
+                    `;
+
+                    contenitore.appendChild(div);
+                });
+
+            } catch (errore) {
+                alert("Errore durante la ricerca.");
+                console.error(errore);
+            }
+        }
+
+        
+    async function apriScheda(idFilm) {
+        try {
+        // Chiamata al backend per ottenere i dettagli del film
+        const risposta = await fetch(`/film/${idFilm}`);
+        const film = await risposta.json();
+
+        // Contenitore della scheda
+        const scheda = document.getElementById("schedaFilm");
+
+        // Visualizzo i dati del film
+        scheda.innerHTML = `
+            <h2>${film.titolo}</h2>
+            <p><strong>Anno:</strong> ${film.anno}</p>
+            <p><strong>Regista:</strong> ${film.regista}</p>
+            <p><strong>Genere:</strong> ${film.genere}</p>
+            <p><strong>Trama:</strong> ${film.trama}</p>
+        `;
+    } catch (errore) {
+        alert("Errore durante il caricamento della scheda del film.");
+        console.error(errore);
+    }
+}
+        
+    </script>
+</body>
+</html>
